@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="ISUR desarrolla software a medida y se encarga del despliegue, el alojamiento y el soporte en la nube. Lima, Arequipa y Trujillo.">
+<title>ISUR | Desarrollo y despliegue en la nube</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230c1b24'/%3E%3Cpath%20d='M32%2010%2054%2032%2032%2054%2010%2032Z'%20fill='none'%20stroke='%233dd6b5'%20stroke-width='5'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='32'%20cy='32'%20r='6'%20fill='%233dd6b5'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0c1b24">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concepto: plano de ingeniería. Grilla fina de fondo, una terminal de despliegue como pieza central,
+   tipografía ancha para titulares y mono para todo lo técnico. La página vende un resultado: app funcionando. */
+:root{
+  --bg:#eef2f1; --surface:#ffffff; --fg:#0c1b24; --muted:#4f6370; --line:#cbd6d7;
+  --accent:#0a7a66; --accent-ink:#ffffff; --grid:rgba(12,27,36,.07);
+  --term-bg:#0c1b24; --term-fg:#dbe7ea; --term-dim:#7e949f; --term-ok:#4fd8b8;
+  --font-d:'Archivo',system-ui,sans-serif; --font-b:'IBM Plex Sans',system-ui,sans-serif; --font-m:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a141b; --surface:#101d26; --fg:#e8f0f2; --muted:#93a6b1; --line:#223441;
+  --accent:#3dd6b5; --accent-ink:#06211b; --grid:rgba(232,240,242,.06);
+  --term-bg:#050b10; --term-fg:#dbe7ea; --term-dim:#6f8794; --term-ok:#4fd8b8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a141b; --surface:#101d26; --fg:#e8f0f2; --muted:#93a6b1; --line:#223441;
+  --accent:#3dd6b5; --accent-ink:#06211b; --grid:rgba(232,240,242,.06);
+  --term-bg:#050b10; --term-fg:#dbe7ea; --term-dim:#6f8794; --term-ok:#4fd8b8; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+.mono{font-family:var(--font-m)}
+.eyebrow{font:500 .76rem/1.3 var(--font-m);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1,h2,h3{font-family:var(--font-d);font-variation-settings:"wdth" 112;line-height:1.04;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(2.5rem,6.4vw,4.6rem);font-weight:800}
+h2{font-size:clamp(1.8rem,4vw,2.7rem);font-weight:800}
+h3{font-size:1.15rem;font-weight:700;font-variation-settings:"wdth" 100;line-height:1.2}
+p{margin:0}
+.lead{color:var(--muted);font-size:1.1rem;max-width:56ch}
+
+/* barra superior */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
+.brand{font:800 1.35rem/1 var(--font-d);font-variation-settings:"wdth" 125;letter-spacing:.02em;text-decoration:none;display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;display:block;flex:none}
+nav{display:flex;gap:22px;align-items:center}
+nav a{font-size:.92rem;text-decoration:none;color:var(--muted)}
+nav a:hover{color:var(--fg)}
+nav a.btn{color:var(--accent-ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .95rem/1 var(--font-b);padding:13px 20px;border-radius:4px;text-decoration:none;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost:hover{border-color:var(--fg)}
+@media(max-width:760px){nav .hide-sm{display:none}}
+
+/* portada */
+.hero{padding-block:72px 64px;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:36px 36px;border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero .lead{margin-top:22px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.badge{display:inline-flex;align-items:center;gap:8px;margin-top:36px;font:500 .8rem/1 var(--font-m);color:var(--muted);border:1px solid var(--line);background:var(--surface);padding:9px 12px;border-radius:3px}
+.badge b{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}.hero{padding-block:48px}}
+
+/* terminal de despliegue */
+.term{margin:0;background:var(--term-bg);color:var(--term-fg);border:1px solid var(--line);border-radius:6px;overflow:hidden;box-shadow:0 18px 40px -22px rgba(0,0,0,.45)}
+.term .bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.08);font:500 .74rem/1 var(--font-m);color:var(--term-dim)}
+.term .bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18);display:inline-block}
+.term .bar span{margin-left:8px}
+.term pre{margin:0;padding:18px 16px 20px;font:400 .82rem/1.75 var(--font-m);white-space:pre-wrap;overflow-wrap:anywhere}
+.ln{display:block;animation:ln .5s ease both;animation-delay:calc(var(--i) * .45s)}
+.ln .p{color:var(--accent)}.ln .ok{color:var(--term-ok)}.ln .d{color:var(--term-dim)}
+@keyframes ln{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.term figcaption{padding:10px 16px 14px;border-top:1px solid rgba(255,255,255,.08);font:400 .74rem/1.4 var(--font-m);color:var(--term-dim)}
+
+/* cifras */
+.stats{border-bottom:1px solid var(--line);background:var(--surface)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:28px 20px 26px 0}
+.stat+.stat{padding-left:24px;border-left:1px solid var(--line)}
+.stat b{display:block;font:800 clamp(1.9rem,4vw,2.8rem)/1 var(--font-d);font-variation-settings:"wdth" 118;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:8px;color:var(--muted);font-size:.9rem}
+@media(max-width:760px){.stats .wrap{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:0;padding-left:0}.stat:nth-child(n+3){border-top:1px solid var(--line)}}
+
+section.s{padding-block:88px}
+.s-head{display:grid;gap:14px;margin-bottom:40px;max-width:700px}
+@media(max-width:760px){section.s{padding-block:60px}}
+
+/* servicios */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card p{color:var(--muted);font-size:.95rem}
+.card .ic{width:36px;height:36px;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;color:var(--accent);margin-bottom:6px}
+.card .ic svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:900px){.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.cards{grid-template-columns:1fr}}
+
+/* por qué ISUR */
+.why{background:var(--surface);border-block:1px solid var(--line)}
+.why .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.why .item{padding:6px 28px 6px 0}
+.why .item+.item{padding-left:28px;border-left:1px solid var(--line)}
+.why h3{margin-bottom:10px;font-size:1.25rem}
+.why p{color:var(--muted);font-size:.95rem}
+@media(max-width:800px){.why .grid{grid-template-columns:1fr;gap:26px}.why .item,.why .item+.item{padding:0;border-left:0}}
+
+/* proceso */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border-top:2px solid var(--fg)}
+.steps li{padding:22px 18px 0 0;position:relative}
+.steps li::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;background:var(--bg);border:2px solid var(--fg);border-radius:50%}
+.steps h3{margin-top:10px;font-size:1.05rem}
+.steps p{margin-top:8px;color:var(--muted);font-size:.9rem}
+@media(max-width:900px){.steps{grid-template-columns:1fr;border-top:0;border-left:2px solid var(--fg);gap:26px}.steps li{padding:0 0 0 22px}.steps li::before{top:6px;left:-8px}}
+
+/* tecnología */
+.tech{display:flex;flex-wrap:wrap;gap:10px}
+.tech span{font:500 .85rem/1 var(--font-m);padding:11px 14px;border:1px solid var(--line);background:var(--surface);border-radius:3px}
+
+/* contacto */
+.contact{background:var(--fg);color:var(--bg)}
+.contact .eyebrow{color:var(--accent)}
+.contact h2{max-width:20ch}
+.contact .lead{color:color-mix(in srgb,var(--bg) 72%,transparent);margin-top:16px}
+.contact .cta{margin-top:30px}
+.contact .btn.ghost{color:var(--bg);border-color:color-mix(in srgb,var(--bg) 35%,transparent)}
+.contact .btn.ghost:hover{border-color:var(--bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .contact{background:var(--surface);color:var(--fg)}
+  :root:not([data-theme="light"]) .contact .lead{color:var(--muted)}
+  :root:not([data-theme="light"]) .contact .btn.ghost{color:var(--fg);border-color:var(--line)}}
+:root[data-theme="dark"] .contact{background:var(--surface);color:var(--fg)}
+:root[data-theme="dark"] .contact .lead{color:var(--muted)}
+:root[data-theme="dark"] .contact .btn.ghost{color:var(--fg);border-color:var(--line)}
+
+footer{border-top:1px solid var(--line);padding-block:40px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between}
+footer b{color:var(--fg);font-weight:600}
+@media (prefers-reduced-motion:reduce){.ln{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+const { useState } = React;
+const html = htm.bind(React.createElement);
+
+// Datos de contacto. Se muestran solo los que tengan valor; ejemplo: correo: 'ventas@tudominio.com', whatsapp: '51999999999'.
+const CONTACTO = { correo: '', whatsapp: '' };
+
+const SERVICIOS = [
+  { t: 'Software a medida', d: 'Diseñamos y desarrollamos aplicaciones web y backends que se ajustan al proceso de tu empresa, listas para usarse desde el celular.', i: 'M8 6l-6 6 6 6M16 6l6 6-6 6M14 4l-4 16' },
+  { t: 'Despliegue en la nube', d: 'Publicamos tu aplicación en AWS, Azure u Oracle Cloud con balanceo de carga, base de datos gestionada y dominio con HTTPS.', i: 'M7 18a4 4 0 010-8 5 5 0 019.6-1A4.5 4.5 0 0117 18zM12 12v6M9.5 14.5L12 12l2.5 2.5' },
+  { t: 'Alojamiento y operación', d: 'Alojamos tu plataforma y la operamos por ti: monitoreo, alertas por correo y actualizaciones sin que tengas que administrar servidores.', i: 'M4 7h16M4 12h16M4 17h16M7 7v0M7 12v0M7 17v0' },
+  { t: 'Soporte técnico', d: 'Mesa de ayuda con acceso remoto seguro para atender a tus usuarios, en horario de oficina y con guardia para incidentes críticos.', i: 'M3 5h18v11H3zM8 20h8M12 16v4' },
+  { t: 'Migración a la nube', d: 'Llevamos tus servicios y datos desde servidores propios a la nube, por fases y con un plan de vuelta atrás.', i: 'M4 12h13M13 7l5 5-5 5M4 5v14' },
+  { t: 'Seguridad y respaldo', d: 'Acceso por capas, datos cifrados y copias en un proveedor distinto para que puedas recuperarte ante un desastre.', i: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4' },
+];
+
+const PORQUE = [
+  ['Construimos y operamos', 'El mismo equipo que desarrolla tu aplicación la publica y la mantiene. No hay que coordinar a tres proveedores distintos.'],
+  ['Entornos repetibles', 'Toda la infraestructura queda descrita como código. Se puede recrear igual, auditar y crecer sin depender de configuraciones manuales.'],
+  ['Tus datos a salvo', 'Los respaldos viven fuera del proveedor principal, así una falla de cuenta o de región no se lleva tu información.'],
+];
+
+const PASOS = [
+  ['Brief', 'Entendemos qué necesitas, quiénes lo usarán y qué sistemas ya tienes.'],
+  ['Propuesta', 'Alcance, arquitectura, plazos y costo mensual de la nube, por escrito.'],
+  ['Desarrollo', 'Entregas cortas que puedes probar mientras se construye.'],
+  ['Despliegue', 'Publicamos con dominio, HTTPS, respaldos y monitoreo activos.'],
+  ['Soporte', 'Seguimos a cargo: alertas, mejoras y atención a tus usuarios.'],
+];
+
+const TECNO = ['AWS', 'Azure', 'Oracle Cloud', 'Terraform', 'Docker', 'PostgreSQL', 'React', 'Cloudflare'];
+
+const TERMINAL = [
+  ['p', '$ ', 'git push origin main'],
+  ['ok', '✓ ', 'Compilación terminada · imagen publicada'],
+  ['p', '$ ', 'terraform apply'],
+  ['d', '  ', 'aws_ecs_service.web: Modifications complete after 2s'],
+  ['ok', '✓ ', 'Apply complete! Resources: 2 added, 1 changed, 0 destroyed.'],
+  ['ok', '✓ ', 'Balanceador: 2 de 2 destinos saludables'],
+  ['ok', '✓ ', 'https://app.tucliente.com → HTTP 200'],
+];
+
+const Logo = () => html`<svg className="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0c1b24"/><path d="M32 10 54 32 32 54 10 32Z" fill="none" stroke="#3dd6b5" strokeWidth="5" strokeLinejoin="round"/><circle cx="32" cy="32" r="6" fill="#3dd6b5"/></svg>`;
+
+const Icon = ({ d }) => html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d=${d}/></svg>`;
+
+function Contacto() {
+  const [ok, setOk] = useState(false);
+  const copiar = () => {
+    const fin = () => { setOk(true); setTimeout(() => setOk(false), 1800); };
+    if (navigator.clipboard) navigator.clipboard.writeText(CONTACTO.correo).then(fin, () => {});
+  };
+  const wa = CONTACTO.whatsapp ? 'https://wa.me/' + CONTACTO.whatsapp : '';
+  return html`
+  <section className="s contact" id="contacto"><div className="wrap">
+    <span className="eyebrow">Contacto</span>
+    <h2 style=${{ marginTop: 14 }}>Cuéntanos qué necesitas publicar.</h2>
+    <p className="lead">Escríbenos con una idea, una aplicación que ya existe o un servidor que quieras migrar. Te respondemos con una propuesta por escrito.</p>
+    <div className="cta">
+      ${wa && html`<a className="btn" href=${wa} target="_blank" rel="noopener">Escribir por WhatsApp</a>`}
+      ${CONTACTO.correo && html`<button className="btn ghost" type="button" onClick=${copiar}>${ok ? 'Copiado ✓' : 'Copiar correo: ' + CONTACTO.correo}</button>`}
+    </div>
+  </div></section>`;
+}
+
+function App() {
+  return html`
+  <${React.Fragment}>
+    <header className="top"><div className="wrap">
+      <a className="brand" href="#inicio" aria-label="ISUR, inicio"><${Logo}/>ISUR</a>
+      <nav aria-label="Principal">
+        <a className="hide-sm" href="#servicios">Servicios</a>
+        <a className="hide-sm" href="#proceso">Cómo trabajamos</a>
+        <a className="hide-sm" href="#tecnologia">Tecnología</a>
+        <a className="btn" href="#contacto">Cotizar proyecto</a>
+      </nav>
+    </div></header>
+
+    <main id="inicio">
+      <section className="hero"><div className="wrap">
+        <div>
+          <span className="eyebrow">Desarrollo y despliegue de software a medida</span>
+          <h1 style=${{ marginTop: 18 }}>Tu aplicación, construida y <em>publicada en la nube.</em></h1>
+          <p className="lead">ISUR diseña y desarrolla software a medida para empresas, y se encarga del despliegue, el alojamiento y el soporte. Recibes una aplicación funcionando, no un proyecto a medias.</p>
+          <div className="cta">
+            <a className="btn" href="#contacto">Cotizar un proyecto</a>
+            <a className="btn ghost" href="#servicios">Ver servicios</a>
+          </div>
+          <span className="badge"><b></b>Proyecto Cloud – Equipo KNM</span>
+        </div>
+        <figure className="term">
+          <div className="bar"><i></i><i></i><i></i><span>despliegue · producción</span></div>
+          <pre aria-label="Ejemplo de un despliegue">${TERMINAL.map(([c, p, t], n) => html`<span className="ln" key=${n} style=${{ '--i': n }}><span className=${c === 'd' ? 'd' : c}>${p}</span>${t}</span>`)}</pre>
+          <figcaption>Ejemplo de un despliegue de principio a fin.</figcaption>
+        </figure>
+      </div></section>
+
+      <section className="stats" aria-label="Cifras"><div className="wrap">
+        <div className="stat"><b>99,9 %</b><span>disponibilidad objetivo</span></div>
+        <div className="stat"><b>2</b><span>zonas de disponibilidad</span></div>
+        <div className="stat"><b>3</b><span>nubes: AWS, Azure y OCI</span></div>
+        <div className="stat"><b>100 %</b><span>infraestructura como código</span></div>
+      </div></section>
+
+      <section className="s" id="servicios"><div className="wrap">
+        <div className="s-head">
+          <span className="eyebrow">Servicios</span>
+          <h2>De la idea a la aplicación funcionando, con alguien a cargo.</h2>
+          <p className="lead">Desarrollamos, publicamos y mantenemos. Tú te quedas con el resultado.</p>
+        </div>
+        <div className="cards">
+          ${SERVICIOS.map(s => html`
+            <article className="card" key=${s.t}>
+              <div className="ic"><${Icon} d=${s.i}/></div>
+              <h3>${s.t}</h3><p>${s.d}</p>
+            </article>`)}
+        </div>
+      </div></section>
+
+      <section className="s why"><div className="wrap">
+        <div className="s-head">
+          <span className="eyebrow">Por qué ISUR</span>
+          <h2>Menos piezas sueltas, más control sobre tu aplicación.</h2>
+        </div>
+        <div className="grid">
+          ${PORQUE.map(([t, d]) => html`<div className="item" key=${t}><h3>${t}</h3><p>${d}</p></div>`)}
+        </div>
+      </div></section>
+
+      <section className="s" id="proceso"><div className="wrap">
+        <div className="s-head">
+          <span className="eyebrow">Cómo trabajamos</span>
+          <h2>Un proceso claro, de la primera reunión al soporte.</h2>
+        </div>
+        <ol className="steps">
+          ${PASOS.map(([t, d]) => html`<li key=${t}><h3>${t}</h3><p>${d}</p></li>`)}
+        </ol>
+      </div></section>
+
+      <section className="s" id="tecnologia" style=${{ paddingTop: 0 }}><div className="wrap">
+        <div className="s-head">
+          <span className="eyebrow">Tecnología</span>
+          <h2>Con qué construimos y dónde publicamos.</h2>
+        </div>
+        <div className="tech">${TECNO.map(t => html`<span key=${t}>${t}</span>`)}</div>
+      </div></section>
+
+      <${Contacto}/>
+    </main>
+
+    <footer><div className="wrap">
+      <div><b>ISUR</b> · Desarrollo y despliegue de software a medida · Lima, Arequipa y Trujillo</div>
+      <div>Proyecto Cloud – Equipo KNM · Universidad Peruana Unión</div>
+    </div></footer>
+  <//>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App}/>`);
+</script>
+</body>
+</html>
